@@ -2,7 +2,33 @@ const express = require('express');
 // 利用 express 這個框架建立一個 web app
 const app = express();
 
+require('dotenv').config();
+const mysql2 = require('mysql2/promise');
+
+let pool = mysql2.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PWD,
+  database: process.env.DB_NAME,
+  // 限制 pool 連線數的上限
+  connectionLimit: 10,
+});
+
+// 允許跨源存取
+// 預設是全部開放
+// 也可以做部分限制，參考 npm cors 的文件
+const cors = require('cors');
+app.use(cors());
+
 // middleware => pipeline pattern
+
+// 設定 express 處理靜態檔案
+// -> express 內建 -> 不需要安裝任何東西
+// localhost:3001/
+// app.use(express.static('./static'));
+// localhost:3001/2048/
+app.use('/2048', express.static('./static'));
 
 // 中間件
 app.use((req, res, next) => {
@@ -24,6 +50,21 @@ app.use((req, res, next) => {
 app.get('/', (req, res, next) => {
   console.log('這裡是首頁 2', req.mfee31, req.dt);
   res.send('Hello Express 9');
+});
+
+app.get('/api', (req, res, next) => {
+  res.json({
+    name: 'John',
+    age: 18,
+  });
+});
+
+app.get('/api/stocks', async (req, res, next) => {
+  // let results = await connection.query('SELECT * FROM stocks');
+  // let data = results[0];
+  console.log('這裡是 /api/stocks');
+  let [data] = await pool.query('SELECT * FROM stocks');
+  res.json(data);
 });
 
 app.use((req, res, next) => {
