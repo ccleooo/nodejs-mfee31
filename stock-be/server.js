@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 
 require('dotenv').config();
-const pool = require('./utils/db.js'); // 使用pool模組
+const pool = require('./utils/db'); // 使用pool模組
 
 // 如果要讓 express 認得 json 資料
 // request Content-Type: application/json
@@ -56,6 +56,9 @@ app.get('/api', (req, res, next) => {
 
 const stockRouter = require('./routers/stockRouter')
 app.use('/api/stocks', stockRouter);
+
+const authRouter = require('./routers/authRouter')
+app.use('/api/auth', authRouter);
 
 app.use((req, res, next) => {
   console.log('這裡是的一個中間件 C');
