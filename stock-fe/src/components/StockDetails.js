@@ -1,15 +1,23 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const StockDetails = () => {
   const [error, setError] = useState(null);
   const { stockId } = useParams();
-  const [page, setPage] = useState(1); // 目前在哪一頁
+
+  // 為了處理網址
+  let navigate = useNavigate();
+  const { currentPage } = useParams();
+  const [page, setPage] = useState(parseInt(currentPage, 10) || 1); // 目前在哪一頁
   const [totalPage, setTotalPage] = useState(0); // 總共有幾頁
 
   const [data, setData] = useState([]);
   // 用 []，component 第一次初始化的時候會跑到
+  useEffect(() => {
+    console.log('空陣列的 useEffect');
+  }, []);
+
   useEffect(() => {
     console.log('page 改變的 useEffect', page);
     async function getData() {
@@ -22,7 +30,7 @@ const StockDetails = () => {
 
   const getPages = () => {
     let pages = [];
-    for (let i = 1; i <= totalPage; i++){
+    for (let i = 1; i <= totalPage; i++) {
       pages.push(
         <li
           style={{
@@ -38,17 +46,18 @@ const StockDetails = () => {
             textAlign: 'center',
           }}
           key={i}
-          onClick={(e)=>{
-            setPage(i)
+          onClick={(e) => {
+            setPage(i);
+            // 處理網址
+            navigate(`/stock/${stockId}/${i}`);
           }}
         >
           {i}
         </li>
-      )
+      );
     }
-    return pages
-    
-  }
+    return pages;
+  };
 
   return (
     <div>
